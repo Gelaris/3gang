@@ -1,24 +1,34 @@
-FROM node:18-alpine
+# Этап сборки
+FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# Установка необходимых зависимостей для сборки
+# Установка зависимостей для сборки
 RUN apk add --no-cache python3 make g++
 
-# Копируем package.json и package-lock.json
+# Копируем только файлы package.json сначала
 COPY package*.json ./
 
-# Устанавливаем зависимости
+# Устанавливаем все зависимости, включая devDependencies
 RUN npm install
 
 # Копируем исходный код
 COPY . .
 
-# Устанавливаем глобально vue-tsc для сборки
-RUN npm install -g vue-tsc
-
 # Собираем проект
 RUN npm run build
+
+# Этап production
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Копируем только необходимые файлы из этапа сборки
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package*.json ./
+
+# Устанавливаем только production зависимости
+RUN npm install --production
 
 # Открываем порт
 EXPOSE 3000
