@@ -1,13 +1,21 @@
-FROM node:18 as build-stage
+FROM node:18
 
 WORKDIR /app
+
+# Копируем файлы package.json
 COPY package*.json ./
+
+# Устанавливаем зависимости
 RUN npm install
+
+# Копируем исходный код
 COPY . .
 
+# Собираем проект
 RUN npm run build
 
-FROM nginx:stable-alpine as production-stage
-COPY --from=build-stage /app/dist /usr/share/nginx/html
+# Открываем порт
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"] 
+
+# Запускаем сервер
+CMD ["npm", "run", "start"] 
