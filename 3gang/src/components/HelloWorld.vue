@@ -48,26 +48,40 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { api } from '../services/api'
 import StatItem from './StatItem.vue'
 import GameButton from './GameButton.vue'
 import ShopModal from './ShopModal.vue'
+
+const TELEGRAM_ID = '12345'
 
 interface GameStats {
   money: number
   level: number
 }
 
-interface GameAction {
-  id: string
-  icon: string
-  handler: () => void
-}
-
 const gameStats = ref<GameStats>({
   money: 0,
   level: 1
 })
+
+console.log('Компонент инициализируется');
+
+onMounted(async () => {
+  console.log('onMounted вызван');
+  try {
+    console.log('Пытаемся получить данные пользователя');
+    const userData = await api.getUser(TELEGRAM_ID);
+    console.log('Получены данные:', userData);
+    gameStats.value = {
+      money: userData.money,
+      level: userData.level
+    }
+  } catch (error) {
+    console.error('Ошибка загрузки данных:', error);
+  }
+});
 
 const isShopOpen = ref(false)
 const isEquipmentOpen = ref(false)
@@ -118,7 +132,7 @@ const studioItems = ref([
   }
 ])
 
-const actions = ref<GameAction[]>([
+const actions = ref([
   {
     id: 'instruments',
     icon: 'icon-button1.png',
@@ -141,8 +155,16 @@ const handleAction = (actionId: string) => {
   action?.handler()
 }
 
-const handleCharacterClick = () => {
-  gameStats.value.money += 1
+const handleCharacterClick = async () => {
+  console.log('Клик по персонажу');
+  gameStats.value.money += 1;
+  try {
+    console.log('Сохраняем новое значение денег:', gameStats.value.money);
+    await api.updateMoney(TELEGRAM_ID, gameStats.value.money);
+    console.log('Деньги успешно сохранены');
+  } catch (error) {
+    console.error('Ошибка сохранения денег:', error);
+  }
 }
 
 const handleBuyItem = (item: any) => {
