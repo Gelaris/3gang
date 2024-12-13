@@ -12,13 +12,32 @@ import HelloWorld from './components/HelloWorld.vue';
 
 <style scoped>
 .container {
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100vh;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
   overflow: hidden;
+  background-color: #242424;
+  padding: 1rem;
+}
+
+.stats {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+  font-size: 1.5em;
+  width: 100%;
+}
+
+.actions {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-around;
+  padding: 1rem;
+  width: 100%;
 }
 
 .background {
@@ -37,6 +56,9 @@ import HelloWorld from './components/HelloWorld.vue';
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+  .container {
+    padding: 0.5rem;
   }
 }
 </style>
