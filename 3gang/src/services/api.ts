@@ -3,7 +3,7 @@ interface User {
   level: number;
 }
 
-const API_URL = 'http://localhost:3000';
+const API_URL = 'https://3gang-backend-production.up.railway.app';
 
 export const api = {
   async getUser(telegramId: string): Promise<User> {
