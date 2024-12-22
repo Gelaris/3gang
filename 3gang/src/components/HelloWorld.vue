@@ -145,31 +145,68 @@ const actions = ref([
 ])
 
 const handleAction = (actionId: string) => {
-  const action = actions.value.find(a => a.id === actionId)
-  action?.handler()
-}
+  const action = actions.value.find((a) => a.id === actionId);
+  action?.handler();
+};
 
 const handleCharacterClick = async () => {
-  console.log('Клик по персонажу');
+  if (!TELEGRAM_ID.value) {
+    console.error('Telegram ID отсутствует.');
+    return;
+  }
+
   gameStats.value.money += 1;
   try {
     console.log('Сохраняем новое значение денег:', gameStats.value.money);
-    await api.updateMoney(TELEGRAM_ID, gameStats.value.money);
+    await api.updateMoney(TELEGRAM_ID.value, gameStats.value.money);
     console.log('Деньги успешно сохранены');
   } catch (error) {
     console.error('Ошибка сохранения денег:', error);
   }
-}
+};
 
-
-const handleBuyItem = (item: any) => {
-  if (gameStats.value.money >= item.price) {
-    gameStats.value.money -= item.price
-    // Добавьте логику покупки предмета в зависимости от его типа
-    console.log(`Куплен предмет: ${item.name}`)
+const handleBuyItem = async (item: any) => {
+  if (!TELEGRAM_ID.value) {
+    console.error('Telegram ID отсутствует.');
+    return;
   }
-}
+  if (gameStats.value.money >= item.price) {
+    gameStats.value.money -= item.price;
 
+    try {
+      const success = await api.buyItem(TELEGRAM_ID.value, item.id, item.type, item.price);
+      if (success) {
+        console.log(`Предмет куплен: ${item.name}`);
+      } else {
+        console.log('Недостаточно средств.');
+      }
+    } catch (error) {
+      console.error('Ошибка покупки предмета:', error);
+    }
+  }
+};
+
+onMounted(async () => {
+  try {
+    // Telegram Web App API инициализация
+    const tg = (window as any).Telegram.WebApp;
+    const user = tg.initDataUnsafe?.user;
+    if (user && user.id) {
+      TELEGRAM_ID.value = String(user.id);
+      console.log('Telegram ID:', TELEGRAM_ID.value);
+
+      // Загрузка данных пользователя
+      const userData = await api.getUser(TELEGRAM_ID.value);
+      gameStats.value.money = userData.money;
+      gameStats.value.level = userData.level;
+      console.log('Данные пользователя загружены:', userData);
+    } else {
+      console.error('Пользовательские данные отсутствуют в Telegram контексте.');
+    }
+  } catch (error) {
+    console.error('Ошибка инициализации Telegram API:', error);
+  }
+});
 </script>
 
 <style scoped>
