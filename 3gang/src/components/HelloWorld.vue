@@ -54,7 +54,7 @@ import StatItem from './StatItem.vue'
 import GameButton from './GameButton.vue'
 import ShopModal from './ShopModal.vue'
 
-const TELEGRAM_ID = '12345'
+const TELEGRAM_ID 
 
 interface GameStats {
   money: number
