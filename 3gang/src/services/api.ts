@@ -17,6 +17,35 @@ const API_URL = 'https://3gang-backend-production.up.railway.app';
 
 export const api = {
   /**
+   * Инициализация пользователя в Telegram Web App
+   * @param initData - Данные инициализации из Telegram Web App
+   * @returns {Promise<User>}
+   */
+  async initUser(initData: string): Promise<User> {
+    console.log('Инициализация пользователя с данными:', initData);
+    try {
+      const response = await fetch(`${API_URL}/users/getUser`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ initData }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Ошибка ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log('Пользователь инициализирован:', data);
+      return data;
+    } catch (error) {
+      console.error('Ошибка инициализации пользователя:', error);
+      throw error;
+    }
+  },
+
+  /**
    * Получение данных пользователя
    * @param telegramId - Telegram ID пользователя
    * @returns {Promise<User>}
@@ -58,7 +87,6 @@ export const api = {
       }
       const data = await response.json();
       console.log('Деньги обновлены:', data);
-      return data;
     } catch (error) {
       console.error('Ошибка обновления денег:', error);
       throw error;

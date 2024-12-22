@@ -205,17 +205,18 @@ onMounted(async () => {
       console.log('Telegram ID:', TELEGRAM_ID.value);
 
       try {
-        // Загрузка данных пользователя
-        const userData = await api.getUser(TELEGRAM_ID.value);
+        // Отправляем initData на сервер для создания/получения данных пользователя
+        const userData = await api.initUser(tg.initData);
         if (userData) {
           gameStats.value.money = userData.money || 0;
           gameStats.value.level = userData.level || 1;
           console.log('Данные пользователя загружены:', userData);
         } else {
-          console.error('Пользователь не найден в базе данных.');
+          console.error('Пользователь не найден или не был создан.');
         }
       } catch (apiError) {
         console.error('Ошибка загрузки данных пользователя:', apiError);
+        // Обработайте ошибку (например, показать пользователю сообщение об ошибке)
       }
     } else {
       console.error('Пользовательские данные отсутствуют в Telegram контексте.');
@@ -224,6 +225,7 @@ onMounted(async () => {
     console.error('Ошибка инициализации Telegram API:', error);
   }
 });
+
 </script>
 
 <style scoped>
