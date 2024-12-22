@@ -68,20 +68,14 @@ const gameStats = ref<GameStats>({
 
 console.log('Компонент инициализируется');
 
-onMounted(async () => {
-  console.log('onMounted вызван');
+async function onMounted(telegramId: string) {
   try {
-    console.log('Пытаемся получить данные пользователя');
-    const userData = await api.getUser(TELEGRAM_ID);
-    console.log('Получены данные:', userData);
-    gameStats.value = {
-      money: userData.money,
-      level: userData.level
-    }
+    const user = await api.getUser(telegramId);
+    console.log('Пользователь загружен:', user);
   } catch (error) {
-    console.error('Ошибка загрузки данных:', error);
+    console.error('Ошибка загрузки пользователя:', error);
   }
-});
+}
 
 const isShopOpen = ref(false)
 const isEquipmentOpen = ref(false)
@@ -155,25 +149,28 @@ const handleAction = (actionId: string) => {
   action?.handler()
 }
 
-const handleCharacterClick = async () => {
-  console.log('Клик по персонажу');
-  gameStats.value.money += 1;
+async function updateUserMoney(telegramId: string, money: number) {
   try {
-    console.log('Сохраняем новое значение денег:', gameStats.value.money);
-    await api.updateMoney(TELEGRAM_ID, gameStats.value.money);
-    console.log('Деньги успешно сохранены');
+    await api.updateMoney(telegramId, money);
+    console.log('Деньги успешно обновлены.');
   } catch (error) {
-    console.error('Ошибка сохранения денег:', error);
+    console.error('Ошибка обновления денег:', error);
   }
 }
 
-const handleBuyItem = (item: any) => {
-  if (gameStats.value.money >= item.price) {
-    gameStats.value.money -= item.price
-    // Добавьте логику покупки предмета в зависимости от его типа
-    console.log(`Куплен предмет: ${item.name}`)
+async function handleBuyItem(telegramId: string, itemId: number, type: string, price: number) {
+  try {
+    const success = await api.buyItem(telegramId, itemId, type, price);
+    if (success) {
+      console.log('Предмет успешно куплен.');
+    } else {
+      console.log('Недостаточно средств или ошибка покупки.');
+    }
+  } catch (error) {
+    console.error('Ошибка покупки предмета:', error);
   }
 }
+
 </script>
 
 <style scoped>
