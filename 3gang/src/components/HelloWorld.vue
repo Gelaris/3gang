@@ -170,6 +170,7 @@ const handleBuyItem = async (item: any) => {
     console.error('Telegram ID отсутствует.');
     return;
   }
+
   if (gameStats.value.money >= item.price) {
     gameStats.value.money -= item.price;
 
@@ -188,18 +189,34 @@ const handleBuyItem = async (item: any) => {
 
 onMounted(async () => {
   try {
-    // Telegram Web App API инициализация
+    // Проверяем доступность Telegram Web App API
+    if (!(window as any).Telegram?.WebApp) {
+      console.error('Telegram Web App API недоступен.');
+      return;
+    }
+
+    // Инициализация Telegram Web App API
     const tg = (window as any).Telegram.WebApp;
+    tg.ready(); // Уведомляем Telegram, что приложение готово
+
     const user = tg.initDataUnsafe?.user;
     if (user && user.id) {
       TELEGRAM_ID.value = String(user.id);
       console.log('Telegram ID:', TELEGRAM_ID.value);
 
-      // Загрузка данных пользователя
-      const userData = await api.getUser(TELEGRAM_ID.value);
-      gameStats.value.money = userData.money;
-      gameStats.value.level = userData.level;
-      console.log('Данные пользователя загружены:', userData);
+      try {
+        // Загрузка данных пользователя
+        const userData = await api.getUser(TELEGRAM_ID.value);
+        if (userData) {
+          gameStats.value.money = userData.money || 0;
+          gameStats.value.level = userData.level || 1;
+          console.log('Данные пользователя загружены:', userData);
+        } else {
+          console.error('Пользователь не найден в базе данных.');
+        }
+      } catch (apiError) {
+        console.error('Ошибка загрузки данных пользователя:', apiError);
+      }
     } else {
       console.error('Пользовательские данные отсутствуют в Telegram контексте.');
     }
