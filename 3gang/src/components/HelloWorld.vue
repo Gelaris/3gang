@@ -225,7 +225,7 @@ onMounted(async () => {
     console.error('Ошибка инициализации Telegram API:', error);
   }
 });
-
+  
 </script>
 
 <style scoped>
