@@ -149,25 +149,24 @@ const handleAction = (actionId: string) => {
   action?.handler()
 }
 
-async function updateUserMoney(telegramId: string, money: number) {
+const handleCharacterClick = async () => {
+  console.log('Клик по персонажу');
+  gameStats.value.money += 1;
   try {
-    await api.updateMoney(telegramId, money);
-    console.log('Деньги успешно обновлены.');
+    console.log('Сохраняем новое значение денег:', gameStats.value.money);
+    await api.updateMoney(TELEGRAM_ID, gameStats.value.money);
+    console.log('Деньги успешно сохранены');
   } catch (error) {
-    console.error('Ошибка обновления денег:', error);
+    console.error('Ошибка сохранения денег:', error);
   }
 }
 
-async function handleBuyItem(telegramId: string, itemId: number, type: string, price: number) {
-  try {
-    const success = await api.buyItem(telegramId, itemId, type, price);
-    if (success) {
-      console.log('Предмет успешно куплен.');
-    } else {
-      console.log('Недостаточно средств или ошибка покупки.');
-    }
-  } catch (error) {
-    console.error('Ошибка покупки предмета:', error);
+
+const handleBuyItem = (item: any) => {
+  if (gameStats.value.money >= item.price) {
+    gameStats.value.money -= item.price
+    // Добавьте логику покупки предмета в зависимости от его типа
+    console.log(`Куплен предмет: ${item.name}`)
   }
 }
 
