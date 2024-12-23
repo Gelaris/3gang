@@ -48,7 +48,7 @@
 </template>
 
 
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
@@ -56,6 +56,7 @@ import { api } from '../services/api'
 import StatItem from './StatItem.vue'
 import GameButton from './GameButton.vue'
 import ShopModal from './ShopModal.vue'
+import tg.initData from "https://telegram.org/js/telegram-web-app.js"
 
 const TELEGRAM_ID = ref<string | null>(null);
 
