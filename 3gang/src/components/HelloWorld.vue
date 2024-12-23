@@ -47,6 +47,9 @@
   </div>
 </template>
 
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { api } from '../services/api'
@@ -225,7 +228,7 @@ onMounted(async () => {
     console.error('Ошибка инициализации Telegram API:', error);
   }
 });
-  
+
 </script>
 
 <style scoped>
